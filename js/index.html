@@ -1,0 +1,38 @@
+
+<!doctype html>
+<html>
+<head>
+    <title>Robophonic</title>
+    <meta charset="utf-8" />
+    <meta http-equiv="Content-type" content="text/html; charset=utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <link href="https://fonts.googleapis.com/css2?family=Major+Mono+Display&family=Open+Sans:wght@300;400&display=swap" rel="stylesheet"> 
+    <link href="http://localhost:3000/style.css" rel="stylesheet"> 
+</head>
+<script>
+    setInterval(() => {
+        fetch('http://localhost:3000/lightStatus').then(dataWrappedByPromise => dataWrappedByPromise.json()).then(data=> {
+            console.log(data.status)
+            var elems = document.getElementsByClassName("lightSource");
+            if (data.status == 1) {
+                elems[0].style.display = 'block';
+            } else {
+                elems[0].style.display = 'none';
+            }
+        }).catch(function (err) {
+        // There was an error
+        console.warn('Something went wrong.', err);
+    });}, 500)
+    
+</script>
+<body>
+<div class="column">
+    <h1>Robophonic</h1>
+    <h2>Hum or whistle to keep the light on. </h2>
+</div>
+<div class="column">
+    <img src="http://localhost:3000/light2.png">
+    <div class="lightSource"></div>
+</div>
+</body>
+</html>
