@@ -13,5 +13,5 @@ Then run the following command:
 
 ```npm i && node index.js```
 
-If you did not get any errors, you can open http://localhost:8080. 
+If you did not get any errors, you can open http://localhost:8000. 
 Start whistling or making high pitch noises to your phone, and you should observe the light turn off and on. Off when low-pitch or no sound, on when high-pitch or whistling.
