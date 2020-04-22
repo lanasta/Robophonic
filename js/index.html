@@ -6,29 +6,75 @@
     <meta charset="utf-8" />
     <meta http-equiv="Content-type" content="text/html; charset=utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1" />
-    <link href="https://fonts.googleapis.com/css2?family=Major+Mono+Display&family=Open+Sans:wght@300;400&display=swap" rel="stylesheet"> 
+    <link href="https://fonts.googleapis.com/css2?family=Montserrat&family=Major+Mono+Display&family=Open+Sans:wght@300;400&display=swap" rel="stylesheet"> 
     <link href="http://localhost:3000/style.css" rel="stylesheet"> 
 </head>
 <script>
-    setInterval(() => {
-        fetch('http://localhost:3000/lightStatus').then(dataWrappedByPromise => dataWrappedByPromise.json()).then(data=> {
-            console.log(data.status)
-            var elems = document.getElementsByClassName("lightSource");
-            if (data.status == 1) {
-                elems[0].style.display = 'block';
+    document.addEventListener("DOMContentLoaded", function() {
+  // Handler when all assets (including images) are loaded
+        var lightModeMap = {}
+        var rgbIncremental = 0;
+        for (var i = 0; i <= 10; i+= 1) {
+            lightModeMap[i] = "rgb(" + rgbIncremental + ", " + rgbIncremental + ", 0)"
+            rgbIncremental += 25.5
+        }
+    // var interactionStepElem = document.getElementById("interactionStep");
+        //interactionStepElem.style.display = 'none';
+        
+    console.log(lightModeMap)
+        setInterval(() => {
+            fetch('http://localhost:3000/lightStatus').then(dataWrappedByPromise => dataWrappedByPromise.json()).then(data=> {
+                console.log(data.status)
+                var elems = document.getElementsByClassName("lightSource");
+                if (data.status == 0) {
+                    elems[0].style.display = 'none';
+                } else {
+                    elems[0].style.display = 'block';
+                    elems[0].style.backgroundColor = lightModeMap[data.status];
+                }
+            }).catch(function (err) {
+            // There was an error
+            console.warn('Something went wrong.', err);
+        });}, 500)
+
+        document.getElementsByName("lFreq")[0].addEventListener('input', processInput);
+        document.getElementsByName("hFreq")[0].addEventListener('input', processInput);
+
+        function calibrate(){
+            var low = document.getElementById("lFreq").value;
+            var high = document.getElementById("hFreq").value;
+        }
+
+        function processInput() {
+            var low = document.getElementById("lFreq").value;
+            var high = document.getElementById("hFreq").value;
+            var btn = document.getElementById("startInteraction");
+            if (high-low >= 100) {
+                btn.style.display = 'block';
             } else {
-                elems[0].style.display = 'none';
+                btn.style.display = 'none';
             }
-        }).catch(function (err) {
-        // There was an error
-        console.warn('Something went wrong.', err);
-    });}, 500)
-    
+        }
+});
 </script>
 <body>
 <div class="column">
     <h1>Robophonic</h1>
-    <h2>Hum or whistle to keep the light on. </h2>
+    <div id="calibrationStep">
+        <h3>First, let's calibrate your sound! Make sure you are in an environment with minimal external noises.
+            To do so, start your Phyphox Audio Correlation experiment. Then, whistle or hum as low and as high as you can (stay within your comfortable zone), 
+            take note of the "Frequency" values at the lowest and highest points and input them below. <br> </h3>
+        <h4>P.S. There should a be minimum difference of 1000Hz in between your 
+            lowest and highest values if you are whistling, and 100Hz if you are humming.</h4> </br>
+            <label for="fname" onchange="processInput()">Lowest frequency:</label>
+            <input type="number" id="lFreq" name="lFreq" value="0"><br><br>
+            <label for="lname" onchange="processInput()">Highest frequency:</label>
+            <input type="number" id="hFreq" name="hFreq" value="0"><br><br>
+            <button id="startInteraction" type="button" onclick="calibrate()">Let's start!</button>
+    </div>
+    <div id="interactionStep">
+        <h2>Hum or whistle in an ascending or a descending tone. You will see the light changing corresponding to your sound. </h2>
+    </div>
 </div>
 <div class="column">
     <img src="http://localhost:3000/light2.png">
