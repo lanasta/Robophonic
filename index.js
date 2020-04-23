@@ -1,6 +1,7 @@
 const http = require('http')
 const fs = require('fs')
 const express = require("express")
+const bodyParser = require('body-parser');
 const app = express()
 const cors = require('cors')
 const port = process.env.PORT || 3000
@@ -9,6 +10,9 @@ app.listen(port, () => {
 })
 app.use(cors())
 app.use(express.static('public'))
+app.use(bodyParser.urlencoded({ extended: true }));
+app.use(bodyParser.json());
+app.use(bodyParser.raw());
 
 
 const { MUSICAL_NOTES_MAP } = require('./musicalNotesMapping') //To get the user friendly form of the musical notes returned
@@ -24,28 +28,22 @@ for (var i = lowerRange; i <= upperRange; i += incrementalValue) {
 
 console.log(frequencyLightLevels)
 
+/* Phyphox configuration. If using Mac, get rid of the :8080 at the end. 
+If using Windows, add :8080 at the end. The PP_ADDRESS differs for each person, 
+and can be found on the phyphox app on your phones */
+let PP_ADDRESS = ""
+const PP_CHANNELS = ["frequency", "semitonesRound", "centsDiff"]  // Names of the buffers in the phyphox experiement we want to pull data from
+const sampling_rate = 100  // Sampling at 100 Hz
+let url = ""
+
 app.get("/lightStatus", (req, res, next) => {
     res.json({"status" : lightMode })
 })
 
-//Go to http://localhost:8000 to see UI (only after running "node index.js")
-// fs.readFile('./index.html', function (err, html) {
-//     if (err) {
-//         throw err 
-//     }       
-//     http.createServer(function(request, response) {  
-//         response.writeHeader(200, {"Content-Type": "text/html"})  
-//         response.write(html)  
-//         response.end()  
-//     }).listen(8000)
-// })
-
-/* Phyphox configuration. If using Mac, get rid of the :8080 at the end. 
-If using Windows, add :8080 at the end. The PP_ADDRESS differs for each person, 
-and can be found on the phyphox app on your phones */
-let PP_ADDRESS = "http://192.168.0.143" 
-const PP_CHANNELS = ["frequency", "semitonesRound", "centsDiff"]  // Names of the buffers in the phyphox experiement we want to pull data from
-const sampling_rate = 100  // Sampling at 100 Hz
+app.post('/setPPAddress',(req, res) => {
+    PP_ADDRESS = req.body["address"]
+    url = PP_ADDRESS + "/get?" + PP_CHANNELS.join("&")
+})
 
 // Animation and data collection config
 const PREV_SAMPLE = 100                   // Size of the buffer of past data that we want to display in the graph
@@ -63,7 +61,6 @@ let peak_frequencies = [], musical_notes = [], cents_from_notes = []
 let isAnimate = false
 let isCollectData = true
 
-let url = PP_ADDRESS + "/get?" + PP_CHANNELS.join("&")
 
 let getData = async() => {
     http.get(url, (resp) => {
@@ -125,5 +122,7 @@ let determineLightMode = (frequency) => {
 }
 
 setInterval(() => {
-    getData()
+    if (PP_ADDRESS != "" && url != "") {
+        getData()
+    }
 }, INTERVALS)
