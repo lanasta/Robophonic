@@ -3,11 +3,12 @@ const fs = require('fs')
 const express = require("express")
 const app = express()
 const cors = require('cors')
-app.use(cors())
-app.use(express.static('public'))
-app.listen(process.env.PORT || 3000, () => {
+app.listen(3000, () => {
  console.log("Server running on port 3000")
 })
+app.use(cors())
+app.use(express.static('public'))
+
 
 const { MUSICAL_NOTES_MAP } = require('./musicalNotesMapping') //To get the user friendly form of the musical notes returned
 const frequencyMap = require('note-frequency-map')
@@ -27,16 +28,16 @@ app.get("/lightStatus", (req, res, next) => {
 })
 
 //Go to http://localhost:8000 to see UI (only after running "node index.js")
-fs.readFile('./index.html', function (err, html) {
-    if (err) {
-        throw err 
-    }       
-    http.createServer(function(request, response) {  
-        response.writeHeader(200, {"Content-Type": "text/html"})  
-        response.write(html)  
-        response.end()  
-    }).listen(process.env.PORT || 8000)
-})
+// fs.readFile('./index.html', function (err, html) {
+//     if (err) {
+//         throw err 
+//     }       
+//     http.createServer(function(request, response) {  
+//         response.writeHeader(200, {"Content-Type": "text/html"})  
+//         response.write(html)  
+//         response.end()  
+//     }).listen(8000)
+// })
 
 /* Phyphox configuration. If using Mac, get rid of the :8080 at the end. 
 If using Windows, add :8080 at the end. The PP_ADDRESS differs for each person, 
