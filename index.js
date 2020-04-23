@@ -43,7 +43,7 @@ app.get("/lightStatus", (req, res, next) => {
 /* Phyphox configuration. If using Mac, get rid of the :8080 at the end. 
 If using Windows, add :8080 at the end. The PP_ADDRESS differs for each person, 
 and can be found on the phyphox app on your phones */
-const PP_ADDRESS = "http://192.168.0.143" 
+let PP_ADDRESS = "http://192.168.0.143" 
 const PP_CHANNELS = ["frequency", "semitonesRound", "centsDiff"]  // Names of the buffers in the phyphox experiement we want to pull data from
 const sampling_rate = 100  // Sampling at 100 Hz
 
@@ -93,6 +93,7 @@ let getData = async() => {
     })
     }).on("error", (err) => {
         lightMode = 0
+        let PP_ADDRESS = "http://192.168.0.143:8080" 
         console.log("Error: " + err.message)
     })
 }
