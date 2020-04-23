@@ -7,11 +7,12 @@
     <meta http-equiv="Content-type" content="text/html; charset=utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1" />
     <link href="https://fonts.googleapis.com/css2?family=Montserrat&family=Major+Mono+Display&family=Open+Sans:wght@300;400&display=swap" rel="stylesheet"> 
-    <link href="http://localhost:3000/style.css" rel="stylesheet"> 
+    <link href="/style.css" rel="stylesheet"> 
 </head>
 <script>
     document.addEventListener("DOMContentLoaded", function() {
   // Handler when all assets (including images) are loaded
+        var readingData = false
         var lightModeMap = {}
         var rgbIncremental = 0;
         for (var i = 0; i <= 10; i+= 1) {
@@ -23,7 +24,8 @@
         
     console.log(lightModeMap)
         setInterval(() => {
-            fetch('http://localhost:3000/lightStatus').then(dataWrappedByPromise => dataWrappedByPromise.json()).then(data=> {
+            if (!readingData) return
+            fetch('/lightStatus').then(dataWrappedByPromise => dataWrappedByPromise.json()).then(data=> {
                 console.log(data.status)
                 var elems = document.getElementsByClassName("lightSource");
                 if (data.status == 0) {
@@ -45,6 +47,10 @@
             var high = document.getElementById("hFreq").value;
         }
 
+        document.getElementById("setAddressBtn").addEventListener('click', function (event) {
+            setAddress();
+        }, false);
+
         function processInput() {
             var low = document.getElementById("lFreq").value;
             var high = document.getElementById("hFreq").value;
@@ -55,11 +61,27 @@
                 btn.style.display = 'none';
             }
         }
+
+        function setAddress() {
+            var ppAddress = document.getElementById("addr").value;
+            var xhr = new XMLHttpRequest();
+            xhr.open("POST", "/setPPAddress", true);
+            xhr.setRequestHeader('Content-Type', 'application/json');
+            xhr.send(JSON.stringify({
+                address: ppAddress
+            }));
+            readingData = true;
+        }
 });
 </script>
 <body>
 <div class="column">
     <h1>Robophonic</h1>
+    <div id="addressSetup">
+            <label for="address">Phyphox Address:</label>
+            <input type="text" id="addr" name="addr" value="http://192.168.0.143">
+            <button id="setAddressBtn" type="button">Set Address</button>
+    </div>
     <div id="calibrationStep">
         <h3>First, let's calibrate your sound! Make sure you are in an environment with minimal external noises.
             To do so, start your Phyphox Audio Correlation experiment. Then, whistle or hum as low and as high as you can (stay within your comfortable zone), 
@@ -77,7 +99,7 @@
     </div>
 </div>
 <div class="column">
-    <img src="http://localhost:3000/light2.png">
+    <img src="light2.png">
     <div class="lightSource"
          style="-webkit-transition: background-color 1s ease-out;
          -moz-transition: background-color 1s ease-out;
