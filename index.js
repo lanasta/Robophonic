@@ -93,7 +93,7 @@ let getData = async() => {
     })
     }).on("error", (err) => {
         lightMode = 0
-        let PP_ADDRESS = "http://192.168.0.143:8080" 
+        PP_ADDRESS = "http://192.168.0.143:8080" 
         console.log("Error: " + err.message)
     })
 }
