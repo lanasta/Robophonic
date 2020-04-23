@@ -7,55 +7,10 @@
     <meta http-equiv="Content-type" content="text/html; charset=utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1" />
     <link href="https://fonts.googleapis.com/css2?family=Montserrat&family=Major+Mono+Display&family=Open+Sans:wght@300;400&display=swap" rel="stylesheet"> 
-    <link href="http://localhost:3000/style.css" rel="stylesheet"> 
+    <link href="./public/style.css" rel="stylesheet"> 
+    <script src="dataProcessing.js"></script>
 </head>
 <script>
-    document.addEventListener("DOMContentLoaded", function() {
-  // Handler when all assets (including images) are loaded
-        var lightModeMap = {}
-        var rgbIncremental = 0;
-        for (var i = 0; i <= 10; i+= 1) {
-            lightModeMap[i] = "rgb(" + rgbIncremental + ", " + rgbIncremental + ", 0)"
-            rgbIncremental += 25.5
-        }
-    // var interactionStepElem = document.getElementById("interactionStep");
-        //interactionStepElem.style.display = 'none';
-        
-    console.log(lightModeMap)
-        setInterval(() => {
-            fetch('http://localhost:3000/lightStatus').then(dataWrappedByPromise => dataWrappedByPromise.json()).then(data=> {
-                console.log(data.status)
-                var elems = document.getElementsByClassName("lightSource");
-                if (data.status == 0) {
-                    elems[0].style.display = 'none';
-                } else {
-                    elems[0].style.display = 'block';
-                    elems[0].style.backgroundColor = lightModeMap[data.status];
-                }
-            }).catch(function (err) {
-            // There was an error
-            console.warn('Something went wrong.', err);
-        });}, 500)
-
-        document.getElementsByName("lFreq")[0].addEventListener('input', processInput);
-        document.getElementsByName("hFreq")[0].addEventListener('input', processInput);
-
-        function calibrate(){
-            var low = document.getElementById("lFreq").value;
-            var high = document.getElementById("hFreq").value;
-        }
-
-        function processInput() {
-            var low = document.getElementById("lFreq").value;
-            var high = document.getElementById("hFreq").value;
-            var btn = document.getElementById("startInteraction");
-            if (high-low >= 100) {
-                btn.style.display = 'block';
-            } else {
-                btn.style.display = 'none';
-            }
-        }
-});
 </script>
 <body>
 <div class="column">
@@ -77,7 +32,7 @@
     </div>
 </div>
 <div class="column">
-    <img src="http://localhost:3000/light2.png">
+    <img src="./public/light2.png">
     <div class="lightSource"></div>
 </div>
 </body>
