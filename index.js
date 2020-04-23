@@ -5,7 +5,7 @@ const app = express()
 const cors = require('cors')
 app.use(cors())
 app.use(express.static('public'))
-app.listen(3000, () => {
+app.listen(process.env.PORT || 3000, () => {
  console.log("Server running on port 3000")
 })
 
@@ -35,7 +35,7 @@ fs.readFile('./index.html', function (err, html) {
         response.writeHeader(200, {"Content-Type": "text/html"})  
         response.write(html)  
         response.end()  
-    }).listen(8000)
+    }).listen(process.env.PORT || 8000)
 })
 
 /* Phyphox configuration. If using Mac, get rid of the :8080 at the end. 
