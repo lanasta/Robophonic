@@ -33,6 +33,8 @@
                 } else {
                     elems[0].style.display = 'block';
                     elems[0].style.backgroundColor = lightModeMap[data.status];
+                    elems[0].style.boxShadow = "0 0 " + (data.status * 10) + "px #fffbdc";   
+
                 }
             }).catch(function (err) {
             // There was an error
@@ -51,6 +53,10 @@
             setAddress();
         }, false);
 
+        document.getElementById("startInteraction").addEventListener('click', function (event) {
+            calibrate();
+        }, false);
+
         function processInput() {
             var low = document.getElementById("lFreq").value;
             var high = document.getElementById("hFreq").value;
@@ -64,13 +70,39 @@
 
         function setAddress() {
             var ppAddress = document.getElementById("addr").value;
-            var xhr = new XMLHttpRequest();
-            xhr.open("POST", "/setPPAddress", true);
-            xhr.setRequestHeader('Content-Type', 'application/json');
-            xhr.send(JSON.stringify({
-                address: ppAddress
-            }));
-            readingData = true;
+            fetch("http://localhost:3000/setPPAddress", {
+                method: "post",
+                headers: {
+                    'Accept': 'application/json',
+                    'Content-Type': 'application/json'
+                },
+                //make sure to serialize your JSON body
+                body: JSON.stringify({
+                    address: ppAddress
+                })
+                })
+                .then( (response) => { 
+                    readingData = true;
+                    document.getElementById("setAddressBtn").style.display = 'none';
+            });
+        }
+
+        function calibrate() {
+            var low = document.getElementById("lFreq").value;
+            var high = document.getElementById("hFreq").value;
+            fetch("/setRange", {
+                method: "post",
+                headers: {
+                    'Accept': 'application/json',
+                    'Content-Type': 'application/json'
+                },
+                body: JSON.stringify({
+                    lowerRange: low,
+                    upperRange: high
+                })
+                })
+                .then((response) => { 
+                });
         }
 });
 </script>
@@ -89,10 +121,10 @@
         <h4>P.S. There should a be minimum difference of 1000Hz in between your 
             lowest and highest values if you are whistling, and 100Hz if you are humming.</h4> </br>
             <label for="fname" onchange="processInput()">Lowest frequency:</label>
-            <input type="number" id="lFreq" name="lFreq" value="0"><br><br>
+            <input type="number" id="lFreq" name="lFreq" value="150"><br><br>
             <label for="lname" onchange="processInput()">Highest frequency:</label>
-            <input type="number" id="hFreq" name="hFreq" value="0"><br><br>
-            <button id="startInteraction" type="button" onclick="calibrate()">Let's start!</button>
+            <input type="number" id="hFreq" name="hFreq" value="350"><br><br>
+            <button id="startInteraction" type="button">Let's start!</button>
     </div>
     <div id="interactionStep">
         <h2>Hum or whistle in an ascending or a descending tone. You will see the light changing corresponding to your sound. </h2>
