@@ -10,4 +10,4 @@ If you are looking for a text editor, VSCode is a good one and will let you use 
 
 ```npm start```
 
-If you did not get any errors, you can open http://localhost:3000. Set your Phyphox address and modify it based on the url you see on the Phyphox app on your phone. Add/omit the ":8080" bit at the end based on your operating system (Omit if Mac, add if Windows). Start whistling or making high pitch noises to your phone, and you should observe the light change brightness according to the sound it picked up from you. Off when low-pitch or no sound, on when high-pitch or whistling.
+If you did not get any errors, you can open http://localhost:3000. Set your Phyphox address and modify it based on the url you see on the Phyphox app on your phone. Add/omit the ":8080" bit at the end based on your phone's operating system (Omit if iOS, add if Android). Start whistling or making high pitch noises to your phone, and you should observe the light change brightness according to the sound it picked up from you. Off when low-pitch or no sound, on when high-pitch or whistling.
