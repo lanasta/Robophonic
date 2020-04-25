@@ -70,21 +70,12 @@ app.post('/setRange',(req, res) => {
 
 
 // Animation and data collection config
-const PREV_SAMPLE = 100                   // Size of the buffer of past data that we want to display in the graph
 const INTERVALS = 1000 / sampling_rate    // Interval to delay between data collection repetitions
 const WHISTLE_MAX_FREQ = 5000  // Maximum frequency in whistling range
 const WHISTLE_MIN_FREQ = 100  // Minimum frequency in whistling range
 
-// Global var to save timestamp
-let xs = []
-
 // Global arrays to save frequency data
 let peak_frequencies = [], musical_notes = [], cents_from_notes = []
-
-// Make one of them true at a time --> Determines if collect data or generate live graph
-let isAnimate = false
-let isCollectData = true
-
 
 let getData = async() => {
     http.get(url, (resp) => {
@@ -154,13 +145,13 @@ let detect_activation = (ts, freq) => {
     if (systemStatus != 1) return
     let low = frequencyLightLevels[0]
     if (freq > low) {
-        if ( end && ts - end > 1000) {
+        if ( end && ts - end > 500) {
             start = ts
         }
         end = ts
     }
 
-    if (start && end - start > 1000) {
+    if (start && end - start > 500) {
         count++
         start = 0
     }
