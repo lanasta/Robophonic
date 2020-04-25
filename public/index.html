@@ -10,6 +10,11 @@
     <link href="/style.css" rel="stylesheet"> 
 </head>
 <script>
+    var STATUS_MSG_MAP = {
+    0: "ready for calibration",
+    1: "calibrated / not activated",
+    2: "activated"
+}
     document.addEventListener("DOMContentLoaded", function() {
   // Handler when all assets (including images) are loaded
         var readingData = false
@@ -21,21 +26,22 @@
         }
     // var interactionStepElem = document.getElementById("interactionStep");
         //interactionStepElem.style.display = 'none';
+    var lightSource = document.getElementsByClassName("lightSource")[0]
+    var msg = document.getElementById("msg")
         
     console.log(lightModeMap)
         setInterval(() => {
             if (!readingData) return
             fetch('/lightStatus').then(dataWrappedByPromise => dataWrappedByPromise.json()).then(data=> {
                 console.log(data.status)
-                var elems = document.getElementsByClassName("lightSource");
-                if (data.status == 0) {
-                    elems[0].style.display = 'none';
+                if (data.systemStatus != 2 || data.lightMode == 0) {
+                    lightSource.style.display = 'none';
                 } else {
-                    elems[0].style.display = 'block';
-                    elems[0].style.backgroundColor = lightModeMap[data.status];
-                    elems[0].style.boxShadow = "0 0 " + (data.status * 10) + "px #fffbdc";   
-
+                    lightSource.style.display = 'block';
+                    lightSource.style.backgroundColor = lightModeMap[data.lightMode];
+                    lightSource.style.boxShadow = "0 0 " + (data.lightMode * 10) + "px #fffbdc";
                 }
+                msg.innerHTML = STATUS_MSG_MAP[data.systemStatus];
             }).catch(function (err) {
             // There was an error
             console.warn('Something went wrong.', err);
@@ -43,11 +49,6 @@
 
         document.getElementsByName("lFreq")[0].addEventListener('input', processInput);
         document.getElementsByName("hFreq")[0].addEventListener('input', processInput);
-
-        function calibrate(){
-            var low = document.getElementById("lFreq").value;
-            var high = document.getElementById("hFreq").value;
-        }
 
         document.getElementById("setAddressBtn").addEventListener('click', function (event) {
             setAddress();
@@ -125,6 +126,7 @@
             <label for="lname" onchange="processInput()">Highest frequency:</label>
             <input type="number" id="hFreq" name="hFreq" value="350"><br><br>
             <button id="startInteraction" type="button">Let's start!</button>
+            <p id="msg"></p>
     </div>
     <div id="interactionStep">
         <h2>Hum or whistle in an ascending or a descending tone. You will see the light changing corresponding to your sound. </h2>

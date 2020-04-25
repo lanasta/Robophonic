@@ -20,6 +20,14 @@ const frequencyMap = require('note-frequency-map')
 let lightMode = 0
 let frequencyLightLevels = []
 
+/*
+0 - ready for calibration
+1 - calibrated
+2 - activated
+*/
+let systemStatus = 0
+
+
 /* Phyphox configuration. If using Mac, get rid of the :8080 at the end. 
 If using Windows, add :8080 at the end. The PP_ADDRESS differs for each person, 
 and can be found on the phyphox app on your phones */
@@ -29,7 +37,12 @@ const sampling_rate = 100  // Sampling at 100 Hz
 let url = ""
 
 app.get("/lightStatus", (req, res, next) => {
-    res.json({"status" : lightMode })
+    res.json(
+        {
+            "lightMode": lightMode,
+            "systemStatus": systemStatus
+        }
+    )
 })
 
 app.post('/setPPAddress',(req, res) => {
@@ -42,7 +55,7 @@ app.post('/setPPAddress',(req, res) => {
 app.post('/setRange',(req, res) => {
     let lowerRange = req.body.lowerRange
     let upperRange = req.body.upperRange
-    res.send('Success.')
+    res.json({"msg": "✔️ Now you can adjust the light with your whistling/humming!"}) // not used
     frequencyLightLevels = []
     let range = (upperRange - lowerRange)
     let levelCount = 10
@@ -50,6 +63,7 @@ app.post('/setRange',(req, res) => {
     for (var i = 0; i < 10; i ++) {
         frequencyLightLevels.push(parseFloat(lowerRange) + parseFloat(incrementalValue*i))
     }
+    systemStatus = 1
     console.log(frequencyLightLevels)
 })
 
@@ -90,13 +104,14 @@ let getData = async() => {
         var date = new Date()
         let myNote = frequencyMap.noteFromFreq(temp_peak_frequency)
         peak_frequencies.push([date.getTime(), temp_peak_frequency])
-        musical_notes.push([date.getTime(), temp_musical_note])
+        detect_activation(date.getTime(), temp_peak_frequency)
+        musical_notes.push([date.getTime(), temp_peak_frequency])
         cents_from_notes.push([date.getTime(), temp_cents_from_note])
         lightMode = determineLightMode(temp_peak_frequency)
         console.log('light mode', lightMode)
         // this node library accurately maps frequencies to musical notes, an option we can use and omit later if not needed
        // console.log(myNote.note) 
-       console.log(date.getTime(), temp_peak_frequency, MUSICAL_NOTES_MAP[temp_musical_note], temp_cents_from_note)
+        console.log(date.getTime(), temp_peak_frequency, MUSICAL_NOTES_MAP[temp_musical_note], temp_cents_from_note)
     })
     }).on("error", (err) => {
         lightMode = 0
@@ -128,6 +143,32 @@ let determineLightMode = (frequency) => {
     } else {
         return 10;
     }
+}
+
+let start = 0;
+let end = 0;
+let count = 0;
+// count 3 consecutive whistlings / hummings at intervals longer than 1 second.
+// each whistling / humming must last longer than 1 second.
+let detect_activation = (ts, freq) => {
+    if (systemStatus != 1) return
+    let low = frequencyLightLevels[0]
+    if (freq > low) {
+        if ( end && ts - end > 1000) {
+            start = ts
+        }
+        end = ts
+    }
+
+    if (start && end - start > 1000) {
+        count++
+        start = 0
+    }
+    if (count >= 3) {
+        systemStatus = 2
+        count = 0
+    }
+    // console.log(count + ' ' + start + ' ' + end + ' ' + freq)
 }
 
 setInterval(() => {
